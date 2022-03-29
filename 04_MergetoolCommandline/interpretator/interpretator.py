@@ -43,6 +43,7 @@ class Cli(cmd.Cmd):
         self.doc_header ="Доступные команды (для справки по конкретной команде наберите 'help _команда_')"
         self.current_lang = LANGUAGE.NATIVE
 
+
     def do_generate(self, args):
         """Генерация имени на экран"""
         # for arg in args:
@@ -85,16 +86,9 @@ class Cli(cmd.Cmd):
         else:
             return list(generators.keys())
 
+
     def do_info(self, args):
         """Получение информации о именах"""
-        # In [4]: elven_generator.get_names_number()
-        # Out[4]: 1952949936
-
-        # In [5]: elven_generator.get_names_number(GENDER.MALE)
-        # Out[5]: 976474968
-
-        # In [6]: elven_generator.get_names_number(GENDER.FEMALE)
-        # Out[6]: 976474968   
         sex = None
         new_generators = generators
         for arg in args.split():
@@ -110,6 +104,7 @@ class Cli(cmd.Cmd):
                 print(new_generators.get_names_number(sex))
         except:
             print("troubles with args")
+
 
     def complete_info(self, text, line, start_index, end_index):
         if line:
@@ -131,12 +126,8 @@ class Cli(cmd.Cmd):
                 ]
         else:
             return list(generators.keys())
-        # return [
-        # item.replace(line+" ", "") for item in list(generators.keys())
-        # if item.startswith(line)
-        # ]
         
-    
+
     def do_language(self, args):
         """Установить язык для вывода имени"""
         args = args.split()[0]
@@ -156,19 +147,12 @@ class Cli(cmd.Cmd):
             ]
         else:
             return self.languages
-
-    def do_send(self, line):
-        pass    
-
     
-
     def default(self, line):
         print("Несуществующая команда")
 
 if __name__ == "__main__":
     cli = Cli()
-    # print(pynames.generators.korean.KoreanNamesGenerator().get_name("female"))
-    
     try:
         cli.cmdloop()
     except KeyboardInterrupt:
