@@ -41,24 +41,24 @@ class Cli(cmd.Cmd):
         self.genders = ['male', 'female']
         self.intro  = "Добро пожаловать\nДля справки наберите 'help'"
         self.doc_header ="Доступные команды (для справки по конкретной команде наберите 'help _команда_')"
-        self.current_lan = "EN"
+        self.current_lang = LANGUAGE.NATIVE
 
     def do_generate(self, args):
         """Генерация имени на экран"""
         # for arg in args:
         new_generators = generators
-        sex = "male"
+        sex = GENDER.MALE
         for arg in args.split():
             if type(new_generators) == dict and arg in new_generators.keys():
                 new_generators = new_generators[arg.replace("\n","")]
             else:
                 if arg in self.genders:
-                    sex = arg
+                    sex = GENDER.MALE if arg == "male" else GENDER.FEMALE if arg == "female" else None
         try:
-            gender = GENDER.MALE if sex == "male" else GENDER.FEMALE if sex == "female" else None
-            lang =  LANGUAGE.EN if self.current_lan == "EN" else LANGUAGE.RU
-            print(new_generators.get_name_simple(gender, lang)) 
-
+            try:
+                print(new_generators.get_name_simple(sex, self.current_lang)) 
+            except:
+                print(new_generators.get_name_simple(sex, LANGUAGE.NATIVE)) 
         except:
             print("troubles with args")         
         # print("hello world")
@@ -88,7 +88,7 @@ class Cli(cmd.Cmd):
         #     return [text[:end_index] + " male", text[:end_index] + " female"]
         # else: 
         
-        
+        line = line.replace("info ", "")
         if text:
 
             return [
@@ -104,8 +104,15 @@ class Cli(cmd.Cmd):
         
     
     def do_language(self, args):
-        """hello - выводит 'hello world' на экран"""
-        print("hello world")
+        """Установить язык для вывод имени"""
+        args = args.split()[0]
+        if args == "RU":
+            self.current_lang = LANGUAGE.RU 
+        elif args == "EN":
+            self.current_lang = LANGUAGE.EN 
+        else:  
+            self.current_lang = LANGUAGE.NATIVE
+        
 
     def complete_language(self, text, line, start_index, end_index):
         if text:
