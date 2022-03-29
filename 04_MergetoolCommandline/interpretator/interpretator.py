@@ -1,4 +1,5 @@
 import cmd, pynames
+from pynames import GENDER, LANGUAGE
 from re import L
 
 
@@ -10,8 +11,8 @@ generators =  {
         'Korean':  pynames.generators.korean.KoreanNamesGenerator(),
         'Goblin': pynames.generators.goblin.GoblinGenerator(),
         'Orc': pynames.generators.orc.OrcNamesGenerator(),
-        'elven DnD': pynames.generators.elven.DnDNamesGenerator(),
-        'elven Warhammer': pynames.generators.elven.WarhammerNamesGenerator(),
+        'elven' : {'DnD': pynames.generators.elven.DnDNamesGenerator()},
+        'elven':  {'Warhammer': pynames.generators.elven.WarhammerNamesGenerator()},
         'iron_kingdoms': 
                         { 
                             'CaspianMidlunderSulese': pynames.generators.iron_kingdoms.CaspianMidlunderSuleseFullnameGenerator(),
@@ -40,20 +41,24 @@ class Cli(cmd.Cmd):
         self.genders = ['male', 'female']
         self.intro  = "Добро пожаловать\nДля справки наберите 'help'"
         self.doc_header ="Доступные команды (для справки по конкретной команде наберите 'help _команда_')"
+        self.current_lan = "EN"
 
     def do_generate(self, args):
-        """hello - выводит 'hello world' на экран"""
+        """Генерация имени на экран"""
         # for arg in args:
         new_generators = generators
         sex = "male"
         for arg in args.split():
-            if type(new_generators)== dict and arg in new_generators.keys():
+            if type(new_generators) == dict and arg in new_generators.keys():
                 new_generators = new_generators[arg.replace("\n","")]
             else:
                 if arg in self.genders:
                     sex = arg
         try:
-            print(new_generators.get_name(sex))
+            gender = GENDER.MALE if sex == "male" else GENDER.FEMALE if sex == "female" else None
+            lang =  LANGUAGE.EN if self.current_lan == "EN" else LANGUAGE.RU
+            print(new_generators.get_name_simple(gender, lang)) 
+
         except:
             print("troubles with args")         
         # print("hello world")
@@ -63,14 +68,10 @@ class Cli(cmd.Cmd):
         if line:
             new_generators = generators
             for word in line.split()[1:]:
-                if word in new_generators.keys():
+                if type(new_generators) == dict and word in new_generators.keys():
                     new_generators = new_generators[word]
                 else:
                     break
-                    return [
-                    item for item in self.genders
-                    if item.startswith(text)
-                    ]
             return [
                 item for item in list(new_generators.keys())
                 if item.startswith(text)
@@ -79,7 +80,7 @@ class Cli(cmd.Cmd):
             return list(generators.keys())
 
     def do_info(self, args):
-        """hello - выводит 'hello world' на экран"""
+        """Получение информации о именах"""
         print("hello world")
 
     def complete_info(self, text, line, start_index, end_index):
@@ -87,7 +88,7 @@ class Cli(cmd.Cmd):
         #     return [text[:end_index] + " male", text[:end_index] + " female"]
         # else: 
         
-        line = line.replace("info ", "")
+        
         if text:
 
             return [
@@ -125,7 +126,7 @@ class Cli(cmd.Cmd):
 
 if __name__ == "__main__":
     cli = Cli()
-    print(generators.keys())
+    # print(pynames.generators.korean.KoreanNamesGenerator().get_name("female"))
     
     try:
         cli.cmdloop()
