@@ -65,6 +65,53 @@ class Cli(cmd.Cmd):
     
 
     def complete_generate(self, text, line, start_index, end_index):
+        new_generators = generators
+        if line:
+            for word in line.split()[1:]:
+                if type(new_generators) == dict and word in new_generators.keys():
+                    new_generators = new_generators[word]
+                else:
+                    break
+            if type(new_generators) == dict:
+                return [
+                    item for item in list(new_generators.keys())
+                    if item.startswith(text)
+                ]
+            else:
+                return [
+                    item for item in self.genders
+                    if item.startswith(text)
+                ]
+        else:
+            return list(generators.keys())
+
+    def do_info(self, args):
+        """Получение информации о именах"""
+        # In [4]: elven_generator.get_names_number()
+        # Out[4]: 1952949936
+
+        # In [5]: elven_generator.get_names_number(GENDER.MALE)
+        # Out[5]: 976474968
+
+        # In [6]: elven_generator.get_names_number(GENDER.FEMALE)
+        # Out[6]: 976474968   
+        sex = None
+        new_generators = generators
+        for arg in args.split():
+            if type(new_generators) == dict and arg in new_generators.keys():
+                new_generators = new_generators[arg.replace("\n","")]
+            else:
+                if arg in self.genders:
+                    sex = GENDER.MALE if arg == "male" else GENDER.FEMALE if arg == "female" else None
+        try:
+            if sex == None:
+                print(new_generators.get_names_number())
+            else:
+                print(new_generators.get_names_number(sex))
+        except:
+            print("troubles with args")
+
+    def complete_info(self, text, line, start_index, end_index):
         if line:
             new_generators = generators
             for word in line.split()[1:]:
@@ -72,29 +119,16 @@ class Cli(cmd.Cmd):
                     new_generators = new_generators[word]
                 else:
                     break
-            return [
-                item for item in list(new_generators.keys())
-                if item.startswith(text)
-            ]
-        else:
-            return list(generators.keys())
-
-    def do_info(self, args):
-        """Получение информации о именах"""
-        print("hello world")
-
-    def complete_info(self, text, line, start_index, end_index):
-        # if text[:end_index] in list(generators.keys()):
-        #     return [text[:end_index] + " male", text[:end_index] + " female"]
-        # else: 
-        
-        line = line.replace("info ", "")
-        if text:
-
-            return [
-                item for item in list(generators.keys())
-                if item.startswith(text)
-            ]
+            if type(new_generators) == dict:
+                return [
+                    item for item in list(new_generators.keys())
+                    if item.startswith(text)
+                ]
+            else:
+                return [
+                    item for item in self.genders
+                    if item.startswith(text)
+                ]
         else:
             return list(generators.keys())
         # return [
@@ -104,7 +138,7 @@ class Cli(cmd.Cmd):
         
     
     def do_language(self, args):
-        """Установить язык для вывод имени"""
+        """Установить язык для вывода имени"""
         args = args.split()[0]
         if args == "RU":
             self.current_lang = LANGUAGE.RU 
