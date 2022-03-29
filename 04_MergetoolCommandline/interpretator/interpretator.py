@@ -1,4 +1,5 @@
 import cmd, pynames
+from re import L
 
 
 
@@ -11,17 +12,19 @@ generators =  {
         'Orc': pynames.generators.orc.OrcNamesGenerator(),
         'elven DnD': pynames.generators.elven.DnDNamesGenerator(),
         'elven Warhammer': pynames.generators.elven.WarhammerNamesGenerator(),
-        'iron_kingdoms': { 'CaspianMidlunderSulese': pynames.generators.iron_kingdoms.CaspianMidlunderSuleseFullnameGenerator(),
-        'Dwarf': pynames.generators.iron_kingdoms.DwarfFullnameGenerator(),
-         ' Gobber': pynames.generators.iron_kingdoms.GobberFullnameGenerator(),
-         'IossanNyss': pynames.generators.iron_kingdoms.IossanNyssFullnameGenerator(),
-         'Khadoran': pynames.generators.iron_kingdoms.KhadoranFullnameGenerator(),
-         'Ogrun': pynames.generators.iron_kingdoms.OgrunFullnameGenerator(),
-         'Ryn': pynames.generators.iron_kingdoms.RynFullnameGenerator(),
-         'ThurianMorridane': pynames.generators.iron_kingdoms.ThurianMorridaneFullnameGenerator(),
-         'Tordoran': pynames.generators.iron_kingdoms.TordoranFullnameGenerator(),
-         'Trollkin': pynames.generators.iron_kingdoms.TrollkinFullnameGenerator()
-         }
+        'iron_kingdoms': 
+                        { 
+                            'CaspianMidlunderSulese': pynames.generators.iron_kingdoms.CaspianMidlunderSuleseFullnameGenerator(),
+                            'Dwarf': pynames.generators.iron_kingdoms.DwarfFullnameGenerator(),
+                            ' Gobber': pynames.generators.iron_kingdoms.GobberFullnameGenerator(),
+                            'IossanNyss': pynames.generators.iron_kingdoms.IossanNyssFullnameGenerator(),
+                            'Khadoran': pynames.generators.iron_kingdoms.KhadoranFullnameGenerator(),
+                            'Ogrun': pynames.generators.iron_kingdoms.OgrunFullnameGenerator(),
+                            'Ryn': pynames.generators.iron_kingdoms.RynFullnameGenerator(),
+                            'ThurianMorridane': pynames.generators.iron_kingdoms.ThurianMorridaneFullnameGenerator(),
+                            'Tordoran': pynames.generators.iron_kingdoms.TordoranFullnameGenerator(),
+                            'Trollkin': pynames.generators.iron_kingdoms.TrollkinFullnameGenerator()
+                        }
     }
 
 
@@ -40,13 +43,36 @@ class Cli(cmd.Cmd):
 
     def do_generate(self, args):
         """hello - выводит 'hello world' на экран"""
-        print("hello world")
+        # for arg in args:
+        new_generators = generators
+        sex = "male"
+        for arg in args.split():
+            if type(new_generators)== dict and arg in new_generators.keys():
+                new_generators = new_generators[arg.replace("\n","")]
+            else:
+                if arg in self.genders:
+                    sex = arg
+        try:
+            print(new_generators.get_name(sex))
+        except:
+            print("troubles with args")         
+        # print("hello world")
     
 
     def complete_generate(self, text, line, start_index, end_index):
-        if text:
+        if line:
+            new_generators = generators
+            for word in line.split()[1:]:
+                if word in new_generators.keys():
+                    new_generators = new_generators[word]
+                else:
+                    break
+                    return [
+                    item for item in self.genders
+                    if item.startswith(text)
+                    ]
             return [
-                item for item in list(generators.keys())
+                item for item in list(new_generators.keys())
                 if item.startswith(text)
             ]
         else:
@@ -63,6 +89,7 @@ class Cli(cmd.Cmd):
         
         line = line.replace("info ", "")
         if text:
+
             return [
                 item for item in list(generators.keys())
                 if item.startswith(text)
